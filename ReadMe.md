@@ -15,7 +15,7 @@
 
 - **→参考にした資料に沿って、Node.js -> homebrew -> npm の環境構築をしたが、恐らく権限と各バージョンのエラー続発で挫折。**
 - CSSのライブラリ、CSS自体がいろいろとバッティングし、一部思った見た目にならず。
-最終的には、CSS内に`content: "\f08b";`という感じでont AwesomeのUnicodeを記述してアイコン設置しました。
+最終的には、CSS内に　`content: "\f08b";`　という感じでont AwesomeのUnicodeを記述してアイコン設置しました。
 - 初期状態のSDKには"databaseURL"が含まれておらず、RealtimeDBの作成後にもう一度取得する必要あり。
 ```
   databaseURL: "https://markdown-app-*****-default-rtdb.firebaseio.com",
