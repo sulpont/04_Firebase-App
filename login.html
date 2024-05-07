@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>markdown-app</title>
+    <link rel="icon" href="./img/favicon.ico" />
+
+    <link rel="stylesheet" href="./css/style.css">
+
+    <!-- CSSフレームワークの読み込み -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+
+    <!-- Simple MDE（ライブラリ）の読み込み -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+    <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+
+    <!-- fontawesomeの読み込み -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+
+</head>
+
+<body>
+
+    <div class="login-logo">
+        <img src="./img/logo.png" width="240">
+        <a href="#" class="btn-icon-login" id="login">Googleアカウントでログイン</a>
+    </div>
+
+    <!-- <div class="flex justify-center w-full h-screen ">
+        <button id="login" class="w-80 h-10 mt-20 text-orange-100 bg-blue-400 hover:text-white"><i
+                class="fab fa-google fa-1x"></i> Googleアカウントでログイン</button>
+    </div> -->
+
+    <footer>
+        <div class="footer">
+            <p class="copyright">Copyright &copy
+                <script>document.write(new Date().getFullYear());</script>
+                Yossy All Right reserved.
+            </p>
+        </div>
+    </footer>
+
+
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+
+    <script type="module">
+        // このページで必要なFirebaseライブラリを読み込む
+        import { initializeApp }
+            from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged }
+            from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
+
+        // FirebaseConfig KEY設定
+        const firebaseConfig = {
+            apiKey: "AIzaSyAOqiGsrwgEcg6_zF57tpMK862OB9KPv1g",
+            authDomain: "markdown-app-8dc58.firebaseapp.com",
+            projectId: "markdown-app-8dc58",
+            storageBucket: "markdown-app-8dc58.appspot.com",
+            messagingSenderId: "1073268481043",
+            appId: "1:1073268481043:web:6d67aeae2ab827bf4473e6"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+
+        // GoogleAuth
+        const provider = new GoogleAuthProvider();
+        provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
+        const auth = getAuth();
+
+        // ログイン処理
+        $("#login").on("click", function () {
+            //Google認証完了後の処理（Firebaseが用意した関数）
+            signInWithPopup(auth, provider).then((result) => {
+                //Login後のページ遷移
+                location.href = "top.html";
+            }).catch((error) => {
+                // Handle Errors here.
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                // The email of the user's account used.
+                const email = error.email;
+                // The AuthCredential type that was used.
+                const credential = GoogleAuthProvider.credentialFromError(error);
+            });
+        });
+
+    </script>
+
+    <script src="./js/main.js"></script>
+
+</body>
+
+</html>

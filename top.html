@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>markdown-app</title>
+    <link rel="icon" href="./img/favicon.ico" />
+
+    <link rel="stylesheet" href="./css/style.css">
+
+    <!-- CSSフレームワークの読み込み -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+
+    <!-- Simple MDE（ライブラリ）の読み込み -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+    <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+
+    <!-- fontawesomeの読み込み -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+
+
+</head>
+
+<body>
+
+    <header>
+        <a href="./top.html"><img src="./img/logo.png" width="200"></a>
+        <ul class="menu">
+            <li><a href="#" class="btn-icon" id="out">ログアウト</a></li>
+            <li><span id="uname"></span></li>
+            <li><img src="" id="prof"></li>
+        </ul>
+
+        <div class="hamburger">
+            <!-- ハンバーガーメニューの3本線 -->
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        </div>
+        <ul class="slide-menu">
+            <li><a href="./contact.html">Contact</a></li>
+            <li>Coming Soon...</li>
+            <li>Coming Soon...</li>
+            <li>Coming Soon...</li>
+        </ul>
+    </header>
+
+
+    <div class="editor">
+        <div class="container">
+
+            <div class="area0">
+                <div>
+                    <h2>Files</h2>
+                </div>
+                <div class="div-left-pain-wrapper">
+                    <div class="div-left-pain-header">
+                        <div>
+                            <img src="./img/lends.png">
+                            <input type="text" class="find">
+                        </div>
+                        <div class="function">
+                            <img src="./img/folder-add.png" id="folder-add">
+                            <img src="./img/file-add.png" id="file-add">
+                        </div>
+                    </div>
+
+                    <select id="title">
+                        <option value="memo1">memo1</option>
+                        <option value="memo2">memo2</option>
+                        <option value="memo3">memo3</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="area1">
+                <div class="col-sm-6 from-group shadow-textarea">
+                    <h2>Editor</h2>
+                    <textarea id="editor" class="form-control" placeholder="ここにテキストを入力します..."></textarea>
+                </div>
+                <div>
+                    <textarea id="text" cols="80" placeholder="ここに入力したテキストが、RealtimeDBに反映されます..."></textarea>
+                </div>
+                <button id="send">送 信</button>
+
+                <div class="alert">送信されました！</div>
+
+            </div>
+
+            <div class="area2">
+                <div class="col-sm-6 from-group shadow-textarea">
+                    <h2>HTML Preview</h2>
+                    <div id="preview"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer">
+            <p class="copyright">Copyright &copy
+                <script>document.write(new Date().getFullYear());</script>
+                Yossy All Right reserved.
+            </p>
+        </div>
+    </footer>
+
+
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+
+
+    <script type="module">
+        // このページで必要なFirebaseライブラリを読み込む
+        import { initializeApp }
+            from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
+        import { getDatabase, ref, push, set, onValue, onChildAdded, remove, onChildRemoved }
+            from "https://www.gstatic.com/firebasejs/10.11.1/firebase-database.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged }
+            from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
+
+        // FirebaseConfig KEY設定
+        const firebaseConfig = {
+            apiKey: "AIzaSyAOqiGsrwgEcg6_zF57tpMK862OB9KPv1g",
+            authDomain: "markdown-app-8dc58.firebaseapp.com",
+            databaseURL: "https://markdown-app-8dc58-default-rtdb.firebaseio.com",  // 最重要！
+            projectId: "markdown-app-8dc58",
+            storageBucket: "markdown-app-8dc58.appspot.com",
+            messagingSenderId: "1073268481043",
+            appId: "1:1073268481043:web:6d67aeae2ab827bf4473e6"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+
+        // RealtimeDBに接続する
+        const db = getDatabase(app);
+
+        // GoogleAuth
+        // https://firebase.google.com/docs/auth/web/google-signin?hl=ja#handle_the_sign-in_flow_with_the_firebase_sdk
+        // 公式ドキュメントより抜粋
+        const provider = new GoogleAuthProvider();
+        provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
+        const auth = getAuth();
+
+        // ログイン時の処理
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const uid = user.uid;
+                //ユーザー情報取得できます
+                if (user !== null) {
+                    user.providerData.forEach((profile) => {
+                        //Login情報取得
+                        $("#uname").text(profile.displayName);
+                        $("#prof").attr("src", profile.photoURL);
+                    });
+                    $("#status").fadeOut(500);
+                };
+
+                //データ登録(Click)
+                $("#send").on("click", function () {
+                    const msg = {  //オブジェクトを作って、どこへ送るかを指定する
+                        title: $("#title").val(),
+                        text: $("#text").val()
+                    }
+                    console.log(msg);
+                    const dbRef = ref(db, "users/" + uid + "/memo/" + $("#title").val());
+                    set(dbRef, msg);  //どこに・何を（obj変数）という形でDBに値をセットする
+
+                    // Show alert
+                    document.querySelector('.alert').style.display = 'block';
+
+                    // Hide alert after 3 seconds
+                    setTimeout(function () {
+                        document.querySelector('.alert').style.display = 'none';
+                    }, 3000);
+                });
+
+                //最初にデータ取得＆onSnapshotでリアルタイムにデータを取得
+                $("#title").on("change", function () {
+                    const dbRef = ref(db, "users/" + uid + "/memo/" + $(this).val());
+                    onValue(dbRef, function (data) {
+                        const msg = data.val();    //オブジェクトデータを取得し、変数msgに代入
+                        console.log(msg);
+                        $("#text").val(msg.text);
+                    });
+                });
+
+
+            } else {
+                _redirect();  // User is signed out
+            }
+        });
+
+
+        // ログアウト処理
+        $("#out").on("click", function () {
+            // signInWithRedirect(auth, provider);
+            signOut(auth).then(() => {
+                // Sign-out successful.
+                _redirect();
+            }).catch((error) => {
+                // An error happened.
+                console.error(error);
+            });
+        });
+
+
+        // ログイン画面へリダイレクト(関数作成)
+        function _redirect() {
+            location.href = "login.html";
+        }
+    </script>
+
+    <script src="./js/main.js"></script>
+
+</body>
+
+</html>
